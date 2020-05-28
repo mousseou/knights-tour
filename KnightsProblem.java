@@ -8,6 +8,7 @@ public class KnightsProblem
 
 	public static void drawBoard(final int[][] board)
 	{
+		System.out.println();
 		for (int[] row : board)
 		{
 			for (int square : row)
@@ -44,7 +45,9 @@ public class KnightsProblem
 		for (int[] m : moves)
 		{
 			if (board[m[0]][m[1]] != 0)
+			{
 				invalid.add(m);
+			}
 		}
 
 		moves.removeAll(invalid);
@@ -58,20 +61,33 @@ public class KnightsProblem
 		drawBoard(board);
 		board[row][col] = oldValue;
 	}
+
+	public static void searchPath(final int row, final int col, final int depth)
+	{
+		if (depth == dim*dim)
+			foundPath = true;
+		else
+		{
+			List<int[]> moves = getValidMoves(row, col, depth+1);
+			for (int[] m : moves)
+			{
+				board[m[0]][m[1]] = depth+1;
+				searchPath(m[0], m[1], depth+1);
+
+				if (foundPath)
+					break;
+				else
+					board[m[0]][m[1]] = 0;
+			}
+		}
+	}
 	
 	public static void main(String args[])
 	{
-		System.out.println("Hello, world");
 		int[] startingPosition = new int[] {Integer.parseInt(args[0]), Integer.parseInt(args[1])};
-		board[startingPosition[0]][startingPosition[1]] = 99;
-		drawBoard(board);
-		
+		board[startingPosition[0]][startingPosition[1]] = 1;
 
-		List<int[]> moves = getValidMoves(startingPosition[0], startingPosition[1], 0);
-		for (int i=0; i < moves.size(); i++)
-		{
-			System.out.println();
-			showMove(moves.get(i)[0], moves.get(i)[1], 0);
-		}
+		searchPath(startingPosition[0], startingPosition[1], 1);
+		drawBoard(board);
 	}
 }
