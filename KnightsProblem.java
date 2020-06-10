@@ -2,11 +2,16 @@ import java.util.*;
 
 public class KnightsProblem
 {
-	static Boolean foundPath = false;
-	static final int dim = 8;
-	static int[][] board = new int[dim][dim];	
+	private boolean foundPath = false;
+	private final int dim = 8;
+	private int[][] board = new int[dim][dim];
 
-	public static void drawBoard(final int[][] board)
+	public KnightsProblem(int row, int col, int start)
+	{
+		board[row][col] = start;
+	}
+
+	public void drawBoard()
 	{
 		System.out.println();
 		for (int[] row : board)
@@ -17,52 +22,34 @@ public class KnightsProblem
 		}
 	}
 
-	public static List<int[]> getValidMoves(final int row, final int col, final int depth)
+	public List<int[]> getValidMoves(final int row, final int col, final int depth)
 	{
-		List<int[]> moves = new ArrayList<int[]>();
-		List<int[]> invalid = new ArrayList<int[]>();
+		List<int[]> moves = new ArrayList<>();
 
 		/* "down" variants */
-		if (!(row == dim-1 || col >= dim-2))
-			moves.add(new int[] {row+1, col+2});
-		if (!(row >= dim-2 || col == dim-1))
+		if (!(row == dim - 1 || col >= dim - 2) && board[row+1][col+2] == 0)
+			moves.add(new int[]{row + 1, col + 2});
+		if (!(row >= dim-2 || col == dim-1) && board[row+2][col+1] == 0)
 			moves.add(new int[] {row+2, col+1});
-		if (!(row == dim-1 || col <= 1))
+		if (!(row == dim-1 || col <= 1) && board[row+1][col-2] == 0)
 			moves.add(new int[] {row+1, col-2});
-		if (!(row >= dim-2 || col == 0))
+		if (!(row >= dim-2 || col == 0) && board[row+2][col-1] == 0)
 			moves.add(new int[] {row+2, col-1});
 
 		/* "up" variants */
-		if (!(row == 0 || col >= dim-2))
+		if (!(row == 0 || col >= dim-2) && board[row-1][col+2] == 0)
 			moves.add(new int[] {row-1, col+2});
-		if (!(row <= 1 || col == dim-1))
+		if (!(row <= 1 || col == dim-1) && board[row-2][col+1] == 0)
 			moves.add(new int[] {row-2, col+1});
-		if (!(row == 0 || col <= 1))
+		if (!(row == 0 || col <= 1) && board[row-1][col-2] == 0)
 			moves.add(new int[] {row-1, col-2});
-		if (!(row <= 1 || col == 0))
+		if (!(row <= 1 || col == 0) && board[row-2][col-1] == 0)
 			moves.add(new int[] {row-2, col-1});
-		
-		for (int[] m : moves)
-		{
-			if (board[m[0]][m[1]] != 0)
-			{
-				invalid.add(m);
-			}
-		}
 
-		moves.removeAll(invalid);
 		return moves;
 	}
 
-	public static void showMove(final int row, final int col, final int depth)
-	{
-		int oldValue = board[row][col];
-		board[row][col] = depth+1;
-		drawBoard(board);
-		board[row][col] = oldValue;
-	}
-
-	public static void searchPath(final int row, final int col, final int depth)
+	public void searchPath(final int row, final int col, final int depth)
 	{
 		if (depth == dim*dim)
 			foundPath = true;
@@ -82,12 +69,11 @@ public class KnightsProblem
 		}
 	}
 	
-	public static void main(String args[])
+	public static void main(String[] args)
 	{
 		int[] startingPosition = new int[] {Integer.parseInt(args[0]), Integer.parseInt(args[1])};
-		board[startingPosition[0]][startingPosition[1]] = 1;
-
-		searchPath(startingPosition[0], startingPosition[1], 1);
-		drawBoard(board);
+		KnightsProblem tour = new KnightsProblem(startingPosition[0], startingPosition[1], 1);
+		tour.searchPath(startingPosition[0], startingPosition[1], 1);
+		tour.drawBoard();
 	}
 }
