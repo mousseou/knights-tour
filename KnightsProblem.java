@@ -11,8 +11,7 @@ public class KnightsProblem
 		board[row][col] = start;
 	}
 
-	public void drawBoard()
-	{
+	public void drawBoard() {
 		System.out.println();
 		for (int[] row : board)
 		{
@@ -22,8 +21,7 @@ public class KnightsProblem
 		}
 	}
 
-	public List<int[]> getValidMoves(final int row, final int col, final int depth)
-	{
+	public List<int[]> getValidMoves(final int row, final int col, final int depth) {
 		List<int[]> moves = new ArrayList<>();
 
 		/* "down" variants */
@@ -49,28 +47,38 @@ public class KnightsProblem
 		return moves;
 	}
 
-	public void searchPath(final int row, final int col, final int depth)
-	{
+	public void searchPath(final int row, final int col, final int depth) {
 		if (depth == dim*dim)
 			foundPath = true;
-		else
-		{
-			List<int[]> moves = getValidMoves(row, col, depth+1);
-			for (int[] m : moves)
-			{
-				board[m[0]][m[1]] = depth+1;
-				searchPath(m[0], m[1], depth+1);
+		else {
+
+			// Prioritize the moves that have less choices in the future
+			// Reference: https://en.wikipedia.org/wiki/Knight's_tour#Warnsdorff's_rule
+			Map<Integer, List<int[]>> moves = new TreeMap<>();
+			for (int[] m : getValidMoves(row, col, depth + 1)) {
+				int futureMoves = getValidMoves(m[0], m[1], -1).size();
+				moves.putIfAbsent(futureMoves, new ArrayList<>());
+				moves.get(futureMoves).add(m);
+			}
+
+			for (int key : moves.keySet()) {
+				for (int[] m : moves.get(key)) {
+					board[m[0]][m[1]] = depth + 1;
+					searchPath(m[0], m[1], depth + 1);
+
+					if (foundPath)
+						break;
+					else
+						board[m[0]][m[1]] = 0;
+				}
 
 				if (foundPath)
 					break;
-				else
-					board[m[0]][m[1]] = 0;
 			}
 		}
 	}
 	
-	public static void main(String[] args)
-	{
+	public static void main(String[] args) {
 		int[] startingPosition = new int[] {Integer.parseInt(args[0]), Integer.parseInt(args[1])};
 		KnightsProblem tour = new KnightsProblem(startingPosition[0], startingPosition[1], 1);
 		tour.searchPath(startingPosition[0], startingPosition[1], 1);
